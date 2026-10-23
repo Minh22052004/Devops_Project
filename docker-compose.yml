@@ -44,19 +44,54 @@
 services:
   # STUDENT TODO: Define frontend service
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: http://localhost:${BACKEND_PORT:-8080}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     # TODO: Add ports, depends_on
 
   # STUDENT TODO: Define backend service
   backend:
     build: ./backend
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: bugtracker
+      DB_USER: bugtracker
+      DB_PASSWORD: bugpassword
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     # TODO: Add ports, environment, depends_on, healthcheck
 
   # STUDENT TODO: Define postgres service
   postgres:
     image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: bugtracker
+      POSTGRES_USER: bugtracker
+      POSTGRES_PASSWORD: bugpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bugtracker -d bugtracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     # TODO: Add environment, ports, volumes, healthcheck
 
 # STUDENT TODO: Define named volumes
 volumes:
-  postgres_data:
+  pgdata:

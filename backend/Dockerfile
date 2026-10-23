@@ -26,3 +26,17 @@
 # ===========================================
 
 # YOUR CODE HERE:
+# ---- Stage 1: cài dependencies production ----
+FROM node:24-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# ---- Stage 2: image chạy thật ----
+FROM node:24-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+EXPOSE 8080
+CMD ["npm", "start"]
