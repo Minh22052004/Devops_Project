@@ -26,17 +26,19 @@
 # ===========================================
 
 # YOUR CODE HERE:
-# ---- Stage 1: builder ----
-
-
+FROM node:24-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
 
 # ---- Stage 2: production ----
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
-COPY package*.json ./
+COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
-COPY . .
+COPY --from=builder /app .
 USER node
 EXPOSE 8080
 CMD ["npm", "start"]
