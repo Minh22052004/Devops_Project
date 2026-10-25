@@ -1,28 +1,3 @@
-# =============================================================================
-# CD Pipeline - runs only when code is pushed/merged to main
-# Purpose: build Docker images, push them to Docker Hub, then deploy
-#
-# ci.yml and cd.yml trigger independently. The branch protection rule (CI must
-# pass before a PR can be merged) is what guarantees broken code never reaches
-# main - and therefore never reaches this pipeline.
-#
-# Your tasks (see Lab 3 - publish images, and Lab 4 - deployment):
-#   TODO 1  Log in to Docker Hub
-#   TODO 2  Build and push the BACKEND image
-#   TODO 3  Build and push the FRONTEND image
-#   TODO 4  Deploy - choose ONE: Option A (SSH to a VPS) or Option B (Render)
-#
-# Repository settings (Settings > Secrets and variables > Actions):
-#   Secrets   DOCKER_HUB_USERNAME        your Docker Hub username
-#             DOCKER_HUB_TOKEN           Docker Hub access token (NOT your password)
-#             SSH_HOST, SSH_USER, SSH_PRIVATE_KEY      Option A only
-#             RENDER_DEPLOY_HOOK_BACKEND, RENDER_DEPLOY_HOOK_FRONTEND   Option B only
-#   Variables BACKEND_URL                public URL of the backend, e.g.
-#                                        http://<server-ip>:8080 or https://<name>.onrender.com
-#                                        (a variable, not a secret: it is public and
-#                                        is baked into the frontend bundle anyway)
-# =============================================================================
-
 name: CD
 
 on:
