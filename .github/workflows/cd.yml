@@ -90,20 +90,20 @@ jobs:
   #   timeout-minutes: 10
 
   #   steps:
-<<<<<<< HEAD
-  #     # -- STUDENT TODO 4A: Deploy via SSH --------------------------------------
-  #     # Use appleboy/ssh-action@v1 with host/username/key from the secrets
-  #     # SSH_HOST / SSH_USER / SSH_PRIVATE_KEY. Start the script with `set -e`
-  #     # so the job fails if any command fails, then:
-  #     #   cd ~/app
-  #     #   git pull --ff-only origin main
-  #     #   (update IMAGE_TAG in .env)
-  #     #   docker compose -f docker-compose.yml pull
-  #     #   docker compose -f docker-compose.yml up -d --no-build --remove-orphans
-  #     #
-  #     # Finish with a smoke test: curl -fsS "${{ vars.BACKEND_URL }}/health"
-  #     - run: echo "Option A placeholder - replace this line with your SSH deploy step"
-=======
+# <<<<<<< HEAD
+#   #     # -- STUDENT TODO 4A: Deploy via SSH --------------------------------------
+#   #     # Use appleboy/ssh-action@v1 with host/username/key from the secrets
+#   #     # SSH_HOST / SSH_USER / SSH_PRIVATE_KEY. Start the script with `set -e`
+#   #     # so the job fails if any command fails, then:
+#   #     #   cd ~/app
+#   #     #   git pull --ff-only origin main
+#   #     #   (update IMAGE_TAG in .env)
+#   #     #   docker compose -f docker-compose.yml pull
+#   #     #   docker compose -f docker-compose.yml up -d --no-build --remove-orphans
+#   #     #
+#   #     # Finish with a smoke test: curl -fsS "${{ vars.BACKEND_URL }}/health"
+#   #     - run: echo "Option A placeholder - replace this line with your SSH deploy step"
+# =======
       # -- STUDENT TODO 4A: Deploy via SSH --------------------------------------
       # Use appleboy/ssh-action@v1 with host/username/key from the secrets
       # SSH_HOST / SSH_USER / SSH_PRIVATE_KEY. Start the script with `set -e`
@@ -116,26 +116,26 @@ jobs:
       #
       # Finish with a smoke test: curl -fsS "${{ vars.BACKEND_URL }}/health"
       # - run: echo "Option A placeholder - replace this line with your SSH deploy step"
->>>>>>> origin/main
+# >>>>>>> origin/main
 
-  # ===========================================================================
-  # OPTION B - Deploy on Render (no SSH needed)
-  # ===========================================================================
-  # One-time setup in the Render dashboard (not in code):
-  #   1. Create a PostgreSQL database; load database/database.sql into it.
-  #   2. Create a Web Service for the backend from the Docker Hub image
-  #      <user>/bug-tracker-backend:latest (port 8080) with the DB_* variables.
-  #   3. Create a Web Service for the frontend from <user>/bug-tracker-frontend:latest
-  #      (port 3000).
-  #   4. Copy each service's Deploy Hook URL into the secrets
-  #      RENDER_DEPLOY_HOOK_BACKEND / RENDER_DEPLOY_HOOK_FRONTEND.
-  #
-  # Render does not poll Docker Hub for new image tags; the deploy hook is how
-  # CD tells Render to pull the new image (see Lab 4 - PaaS).
-  #
-  # STUDENT TODO 4B: uncomment and adapt (add `if: ...` or delete the job you
-  # do not use - a job whose secret is missing will fail).
-  #
+#   # ===========================================================================
+#   # OPTION B - Deploy on Render (no SSH needed)
+#   # ===========================================================================
+#   # One-time setup in the Render dashboard (not in code):
+#   #   1. Create a PostgreSQL database; load database/database.sql into it.
+#   #   2. Create a Web Service for the backend from the Docker Hub image
+#   #      <user>/bug-tracker-backend:latest (port 8080) with the DB_* variables.
+#   #   3. Create a Web Service for the frontend from <user>/bug-tracker-frontend:latest
+#   #      (port 3000).
+#   #   4. Copy each service's Deploy Hook URL into the secrets
+#   #      RENDER_DEPLOY_HOOK_BACKEND / RENDER_DEPLOY_HOOK_FRONTEND.
+#   #
+#   # Render does not poll Docker Hub for new image tags; the deploy hook is how
+#   # CD tells Render to pull the new image (see Lab 4 - PaaS).
+#   #
+#   # STUDENT TODO 4B: uncomment and adapt (add `if: ...` or delete the job you
+#   # do not use - a job whose secret is missing will fail).
+#   #
   deploy-render:
     name: "[Option B] Trigger Render deploy"
     runs-on: ubuntu-latest
