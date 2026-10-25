@@ -1,5 +1,23 @@
 const request = require('supertest');
-const app     = require('../server');
+
+// ---------------------------------------------------------------------------
+// Mock the pg module so tests can run without a real PostgreSQL database.
+// ---------------------------------------------------------------------------
+const mockQuery = jest.fn();
+jest.mock('pg', () => {
+  return {
+    Pool: jest.fn(() => ({
+      query: mockQuery,
+    })),
+  };
+});
+
+const app = require('../server');
+
+// Reset mock state between tests
+beforeEach(() => {
+  mockQuery.mockReset();
+});
 
 // ---------------------------------------------------------------------------
 // CORE TESTS — 7 tests that exercise all 6 bugs
@@ -17,6 +35,7 @@ test('GET /health returns 200 and status healthy', async () => {
 // ── Test 2: List bugs ────────────────────────────────────────────────────────
 // Requires Bug #1 to be fixed so the database connection succeeds.
 test('GET /api/bugs returns 200 and an array', async () => {
+  mockQuery.mockResolvedValue({ rows: [] });
   const res = await request(app).get('/api/bugs');
   expect(res.statusCode).toBe(200);
   expect(Array.isArray(res.body)).toBe(true);
@@ -24,6 +43,9 @@ test('GET /api/bugs returns 200 and an array', async () => {
 
 // ── Test 3: Create a bug ─────────────────────────────────────────────────────
 test('POST /api/bugs with valid title returns 201 and the new bug', async () => {
+  mockQuery.mockResolvedValue({
+    rows: [{ id: 1, title: 'Test bug from automated suite', status: 'open', created_at: new Date().toISOString() }],
+  });
   const res = await request(app)
     .post('/api/bugs')
     .send({ title: 'Test bug from automated suite' });
@@ -49,6 +71,13 @@ test('POST /api/bugs with whitespace-only title returns 400', async () => {
 
 // ── Test 6: Delete a bug (Bug #3) ────────────────────────────────────────────
 test('DELETE /api/bugs/:id removes the bug and returns 200', async () => {
+  const bugId = 42;
+
+  // Mock POST (create)
+  mockQuery.mockResolvedValueOnce({
+    rows: [{ id: bugId, title: 'Bug to be deleted', status: 'open', created_at: new Date().toISOString() }],
+  });
+
   // Create a bug first, then delete it
   const created = await request(app)
     .post('/api/bugs')
@@ -56,10 +85,18 @@ test('DELETE /api/bugs/:id removes the bug and returns 200', async () => {
   expect(created.statusCode).toBe(201);
 
   const id = created.body.id;
+
+  // Mock DELETE
+  mockQuery.mockResolvedValueOnce({
+    rows: [{ id, title: 'Bug to be deleted', status: 'open' }],
+  });
+
   const del = await request(app).delete(`/api/bugs/${id}`);
   expect(del.statusCode).toBe(200);
 
-  // Confirm it is gone
+  // Mock GET (confirm it is gone — return empty list)
+  mockQuery.mockResolvedValueOnce({ rows: [] });
+
   const list = await request(app).get('/api/bugs');
   const ids = list.body.map(b => b.id);
   expect(ids).not.toContain(id);
@@ -67,12 +104,25 @@ test('DELETE /api/bugs/:id removes the bug and returns 200', async () => {
 
 // ── Test 7: Update a bug (Bug #4) ────────────────────────────────────────────
 test('PUT /api/bugs/:id updates title and status, returns 200', async () => {
+  const bugId = 99;
+
+  // Mock POST (create)
+  mockQuery.mockResolvedValueOnce({
+    rows: [{ id: bugId, title: 'Bug to be updated', status: 'open', created_at: new Date().toISOString() }],
+  });
+
   const created = await request(app)
     .post('/api/bugs')
     .send({ title: 'Bug to be updated' });
   expect(created.statusCode).toBe(201);
 
   const id = created.body.id;
+
+  // Mock PUT (update)
+  mockQuery.mockResolvedValueOnce({
+    rows: [{ id, title: 'Updated bug title', status: 'in_progress' }],
+  });
+
   const updated = await request(app)
     .put(`/api/bugs/${id}`)
     .send({ title: 'Updated bug title', status: 'in_progress' });

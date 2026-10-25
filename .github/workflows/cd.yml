@@ -115,6 +115,7 @@ jobs:
   #   timeout-minutes: 10
 
   #   steps:
+<<<<<<< HEAD
   #     # -- STUDENT TODO 4A: Deploy via SSH --------------------------------------
   #     # Use appleboy/ssh-action@v1 with host/username/key from the secrets
   #     # SSH_HOST / SSH_USER / SSH_PRIVATE_KEY. Start the script with `set -e`
@@ -127,6 +128,20 @@ jobs:
   #     #
   #     # Finish with a smoke test: curl -fsS "${{ vars.BACKEND_URL }}/health"
   #     - run: echo "Option A placeholder - replace this line with your SSH deploy step"
+=======
+      # -- STUDENT TODO 4A: Deploy via SSH --------------------------------------
+      # Use appleboy/ssh-action@v1 with host/username/key from the secrets
+      # SSH_HOST / SSH_USER / SSH_PRIVATE_KEY. Start the script with `set -e`
+      # so the job fails if any command fails, then:
+      #   cd ~/app
+      #   git pull --ff-only origin main
+      #   (update IMAGE_TAG in .env)
+      #   docker compose -f docker-compose.yml pull
+      #   docker compose -f docker-compose.yml up -d --no-build --remove-orphans
+      #
+      # Finish with a smoke test: curl -fsS "${{ vars.BACKEND_URL }}/health"
+      # - run: echo "Option A placeholder - replace this line with your SSH deploy step"
+>>>>>>> origin/main
 
   # ===========================================================================
   # OPTION B - Deploy on Render (no SSH needed)
@@ -146,18 +161,19 @@ jobs:
   # STUDENT TODO 4B: uncomment and adapt (add `if: ...` or delete the job you
   # do not use - a job whose secret is missing will fail).
   #
-  # deploy-render:
-  #   name: "[Option B] Trigger Render deploy"
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-push
-  #   timeout-minutes: 5
-  #   steps:
-  #     - name: Trigger backend deploy
-  #       env:
-  #         HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
-  #       run: curl -fsS -X POST "$HOOK_URL"
-  #
-  #     - name: Trigger frontend deploy
-  #       env:
-  #         HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
-  #       run: curl -fsS -X POST "$HOOK_URL"
+  deploy-render:
+    name: "[Option B] Trigger Render deploy"
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 5
+    steps:
+      - name: Trigger backend deploy
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+        run: curl -fsS -X POST "$HOOK_URL"
+  
+      - name: Trigger frontend deploy
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
+        run: curl -fsS -X POST "$HOOK_URL"
