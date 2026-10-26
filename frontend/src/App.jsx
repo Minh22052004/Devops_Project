@@ -147,6 +147,10 @@ function App() {
   // Call DELETE /api/bugs/:id, then call fetchBugs() to refresh the list.
   const deleteBug = async (id) => {
     // TODO: your code here
+    await fetch(`${API_URL}/api/bugs/${id}`, {
+      method: 'DELETE',
+    });
+    fetchBugs();
   };
 
   // OPTIONAL CHALLENGE 2 (bonus): implement cycleStatus
@@ -155,6 +159,13 @@ function App() {
   // Hint: const STATUS_CYCLE = { open: 'in_progress', in_progress: 'closed', closed: 'open' };
   const cycleStatus = async (bug) => {
     // TODO: your code here
+    const next = { open: 'in_progress', in_progress: 'closed', closed: 'open' };
+    await fetch(`${API_URL}/api/bugs/${bug.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: bug.title, status: next[bug.status] }),
+    });
+    fetchBugs();
   };
 
   // ── Pagination ──────────────────────────────────────────────────────────────

@@ -101,46 +101,46 @@ test('calls POST /api/bugs when a valid title is submitted', async () => {
 // CHALLENGE 1: Delete button
 // Each bug should have a Delete button that calls DELETE /api/bugs/:id
 //
-// test('Delete button calls DELETE /api/bugs/:id', async () => {
-//   mockFetchBugs([{ id: 5, title: 'Bug to delete', status: 'open' }]);
-//   global.fetch
-//     .mockResolvedValueOnce({ ok: true, json: async () => [{ id: 5, title: 'Bug to delete', status: 'open' }] })
-//     .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
-//     .mockResolvedValueOnce({ ok: true, json: async () => [] });
-//   render(<App />);
-//   await waitFor(() => expect(screen.getByText('Bug to delete')).toBeInTheDocument());
-//   fireEvent.click(screen.getByRole('button', { name: /delete/i }));
-//   await waitFor(() => {
-//     const deleteCall = global.fetch.mock.calls.find(
-//       ([url, opts]) => opts && opts.method === 'DELETE'
-//     );
-//     expect(deleteCall).toBeDefined();
-//   });
-// });
+test('Delete button calls DELETE /api/bugs/:id', async () => {
+  mockFetchBugs([{ id: 5, title: 'Bug to delete', status: 'open' }]);
+  global.fetch
+    .mockResolvedValueOnce({ ok: true, json: async () => [{ id: 5, title: 'Bug to delete', status: 'open' }] })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+    .mockResolvedValueOnce({ ok: true, json: async () => [] });
+  render(<App />);
+  await waitFor(() => expect(screen.getByText('Bug to delete')).toBeInTheDocument());
+  fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+  await waitFor(() => {
+    const deleteCall = global.fetch.mock.calls.find(
+      ([url, opts]) => opts && opts.method === 'DELETE'
+    );
+    expect(deleteCall).toBeDefined();
+  });
+});
 
 // CHALLENGE 2: Status cycle / severity filter
 //
 // A) Status cycle button cycles open → in_progress → closed → open
-// test('Status button cycles bug status via PUT', async () => {
-//   mockFetchBugs([{ id: 1, title: 'My bug', status: 'open' }]);
-//   render(<App />);
-//   await waitFor(() => expect(screen.getByText('My bug')).toBeInTheDocument());
-//   fireEvent.click(screen.getByRole('button', { name: /open|in.progress|closed/i }));
-//   await waitFor(() => {
-//     const putCall = global.fetch.mock.calls.find(([url, opts]) => opts && opts.method === 'PUT');
-//     expect(putCall).toBeDefined();
-//   });
-// });
+test('Status button cycles bug status via PUT', async () => {
+  mockFetchBugs([{ id: 1, title: 'My bug', status: 'open' }]);
+  render(<App />);
+  await waitFor(() => expect(screen.getByText('My bug')).toBeInTheDocument());
+  fireEvent.click(screen.getByRole('button', { name: /open|in.progress|closed/i }));
+  await waitFor(() => {
+    const putCall = global.fetch.mock.calls.find(([url, opts]) => opts && opts.method === 'PUT');
+    expect(putCall).toBeDefined();
+  });
+});
 //
 // B) Severity filter shows only bugs matching selected severity
-// test('severity filter hides non-matching bugs', async () => {
-//   mockFetchBugs([
-//     { id: 1, title: 'Critical issue', status: 'open', severity: 'critical' },
-//     { id: 2, title: 'Minor typo',    status: 'open', severity: 'low' },
-//   ]);
-//   render(<App />);
-//   await waitFor(() => expect(screen.getByText('Critical issue')).toBeInTheDocument());
-//   fireEvent.change(screen.getByRole('combobox', { name: /severity/i }), { target: { value: 'critical' } });
-//   expect(screen.getByText('Critical issue')).toBeInTheDocument();
-//   expect(screen.queryByText('Minor typo')).not.toBeInTheDocument();
-// });
+test('severity filter hides non-matching bugs', async () => {
+  mockFetchBugs([
+    { id: 1, title: 'Critical issue', status: 'open', severity: 'critical' },
+    { id: 2, title: 'Minor typo',    status: 'open', severity: 'low' },
+  ]);
+  render(<App />);
+  await waitFor(() => expect(screen.getByText('Critical issue')).toBeInTheDocument());
+  fireEvent.change(screen.getByRole('combobox', { name: /severity/i }), { target: { value: 'critical' } });
+  expect(screen.getByText('Critical issue')).toBeInTheDocument();
+  expect(screen.queryByText('Minor typo')).not.toBeInTheDocument();
+});
