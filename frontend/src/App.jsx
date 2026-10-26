@@ -145,28 +145,34 @@ function App() {
 
   // OPTIONAL CHALLENGE 1 (bonus): implement deleteBug
   // Call DELETE /api/bugs/:id, then call fetchBugs() to refresh the list.
-  const deleteBug = async (id) => {
-    // TODO: your code here
-    await fetch(`${API_URL}/api/bugs/${id}`, {
-      method: 'DELETE',
-    });
-    fetchBugs();
-  };
+const deleteBug = async (id) => {
+  try {
+    const res = await fetch(`${API_URL}/api/bugs/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
+    fetchBugs(); // làm mới danh sách
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // OPTIONAL CHALLENGE 2 (bonus): implement cycleStatus
   // Call PUT /api/bugs/:id with { title: bug.title, status: <next status> }, then fetchBugs().
   // The status cycles open -> in_progress -> closed -> open.
   // Hint: const STATUS_CYCLE = { open: 'in_progress', in_progress: 'closed', closed: 'open' };
-  const cycleStatus = async (bug) => {
-    // TODO: your code here
-    const next = { open: 'in_progress', in_progress: 'closed', closed: 'open' };
-    await fetch(`${API_URL}/api/bugs/${bug.id}`, {
+const cycleStatus = async (bug) => {
+  const next = { open: 'in_progress', in_progress: 'closed', closed: 'open' };
+  try {
+    const res = await fetch(`${API_URL}/api/bugs/${bug.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: bug.title, status: next[bug.status] }),
+      body: JSON.stringify({ status: next[bug.status] || 'open' }),
     });
+    if (!res.ok) throw new Error(`Update failed: ${res.status}`);
     fetchBugs();
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // ── Pagination ──────────────────────────────────────────────────────────────
   const totalPages = Math.max(1, Math.ceil(bugs.length / BUGS_PER_PAGE));
@@ -262,6 +268,10 @@ function App() {
                     </span>
 
                     {/* OPTIONAL CHALLENGE 1: add a Delete button that calls deleteBug(bug.id) */}
+                    <button onClick={() => cycleStatus(bug)}>
+  {bug.status === 'open' ? 'Start' : bug.status === 'in_progress' ? 'Close' : 'Reopen'}
+</button>
+<button onClick={() => deleteBug(bug.id)}>Delete</button>
                   </div>
 
                 </li>
