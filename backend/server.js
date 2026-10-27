@@ -50,7 +50,7 @@ app.post('/api/bugs', async (req, res) => {
 
     // STUDENT FIX: Add validation here
     if (!title || !title.trim()) {
-      return res.status(200).json({ error: 'Title is required' });
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     const result = await pool.query(
